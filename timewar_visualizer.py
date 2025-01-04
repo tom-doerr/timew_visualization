@@ -175,6 +175,13 @@ if __name__ == "__main__":
     print(visualizer.create_blocks(5, 'red', 'black'))
     print(visualizer.create_blocks(15, 'blue', 'red', '▓'))
     print()
+
+    # Demo styled text
+    print("Styled Text Examples:")
+    print(visualizer.create_styled_text("Hello", "red", "green", 3))
+    print(visualizer.create_styled_text("World", "blue", "yellow", 2))
+    print(visualizer.create_styled_text("Python", "white", "magenta"))
+    print()
     
     # Demo data
     demo_events = [
