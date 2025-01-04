@@ -20,7 +20,7 @@ class TimewarVisualizer:
         
     def create_tag_label(self, tag: str, fg_color: str = 'white', bg_color: str = 'blue', width: int = None) -> str:
         """Create a colored tag label with background, optionally fixed width"""
-        label = f" {tag} "
+        label = f"{tag} "
         if width is not None:
             # Truncate or pad to fit width
             if len(label) > width:
@@ -281,19 +281,6 @@ if __name__ == "__main__":
     print(visualizer.create_tag_label('short', 'black', 'yellow', width=10))
     print()
     
-    # Demo blocks
-    print("Block Examples:")
-    print(visualizer.create_blocks(10, 'green', 'white'))
-    print(visualizer.create_blocks(5, 'red', 'black'))
-    print(visualizer.create_blocks(15, 'blue', 'red', '▓'))
-    print()
-
-    # Demo styled text
-    print("Styled Text Examples:")
-    print(visualizer.create_styled_text("Hello", "red", "green", 5))
-    print(visualizer.create_styled_text("World", "blue", "yellow", 3))
-    print(visualizer.create_styled_text("Python", "white", "magenta", 4))
-    print()
     
     # Demo data
     demo_events = [
@@ -322,23 +309,3 @@ if __name__ == "__main__":
             'label': 'Project Y'
         },
     ]
-    
-    # Demo hourly blocks
-    print("\nHourly Block Breakdown:")
-    visualizer = TimewarVisualizer()
-    hourly_blocks = visualizer.get_hourly_blocks(demo_events)
-    for hour, blocks in hourly_blocks.items():
-        print(f"{hour}:")
-        for block in blocks:
-            print(f"  {block['tag']}: {block['duration']} minutes")
-    
-    # Create timeline
-    visualizer.create_timeline(demo_events)
-    
-    # Demo single line timeline
-    print("\nSingle Line Timeline:")
-    print(visualizer.create_single_line_timeline(demo_events))
-    
-    # Demo wrapped timeline
-    print("\nWrapped Timeline:")
-    print(visualizer.create_wrapped_timeline(demo_events))
