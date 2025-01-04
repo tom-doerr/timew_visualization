@@ -18,9 +18,16 @@ class TimewarVisualizer:
         """Get color name for a tag, defaulting to white if not found"""
         return self.tag_colors.get(tag.lower(), 'white')
         
-    def create_tag_label(self, tag: str, fg_color: str = 'white', bg_color: str = 'blue') -> str:
-        """Create a colored tag label with background"""
-        return colored(f" {tag} ", fg_color, f"on_{bg_color}")
+    def create_tag_label(self, tag: str, fg_color: str = 'white', bg_color: str = 'blue', width: int = None) -> str:
+        """Create a colored tag label with background, optionally fixed width"""
+        label = f" {tag} "
+        if width is not None:
+            # Truncate or pad to fit width
+            if len(label) > width:
+                label = label[:width]
+            else:
+                label = label.ljust(width)
+        return colored(label, fg_color, f"on_{bg_color}")
     
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
@@ -66,10 +73,15 @@ if __name__ == "__main__":
     # Demo tag labels
     visualizer = TimewarVisualizer()
     print("Tag Label Examples:")
-    print(visualizer.create_tag_label('meeting', 'white', 'green'))
-    print(visualizer.create_tag_label('coding', 'black', 'yellow'))
-    print(visualizer.create_tag_label('break', 'white', 'red'))
-    print(visualizer.create_tag_label('work', 'white', 'blue'))
+    print(visualizer.create_tag_label('meeting', 'white', 'green', width=10))
+    print(visualizer.create_tag_label('coding', 'black', 'yellow', width=10))
+    print(visualizer.create_tag_label('break', 'white', 'red', width=10))
+    print(visualizer.create_tag_label('work', 'white', 'blue', width=10))
+    print()
+    
+    print("Fixed Width Examples:")
+    print(visualizer.create_tag_label('verylongtagname', 'white', 'green', width=10))
+    print(visualizer.create_tag_label('short', 'black', 'yellow', width=10))
     print()
     
     # Demo data
