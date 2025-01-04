@@ -52,6 +52,32 @@ class TimewarVisualizer:
             
         return styled
 
+    def get_events_in_hour(self, events: List[Dict], hour: datetime) -> List[Dict]:
+        """Get all events happening in a specific hour"""
+        hour_start = hour.replace(minute=0, second=0, microsecond=0)
+        hour_end = hour_start + timedelta(hours=1)
+        
+        events_in_hour = []
+        for event in events:
+            # Check if event overlaps with the hour
+            if (event['start'] < hour_end) and (event['end'] > hour_start):
+                # Calculate overlap start and end
+                overlap_start = max(event['start'], hour_start)
+                overlap_end = min(event['end'], hour_end)
+                
+                # Calculate duration in minutes
+                duration = int((overlap_end - overlap_start).total_seconds() / 60)
+                
+                events_in_hour.append({
+                    'tag': event['tag'],
+                    'label': event.get('label', ''),
+                    'start': overlap_start,
+                    'end': overlap_end,
+                    'duration': duration
+                })
+        
+        return events_in_hour
+
     def get_hourly_blocks(self, events: List[Dict]) -> Dict[str, List[Dict]]:
         """Get tag blocks per hour with their duration in minutes"""
         hourly_data = {}

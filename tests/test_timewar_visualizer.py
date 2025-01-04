@@ -62,3 +62,28 @@ def test_fixed_width_tag_labels(visualizer):
         else:
             assert label.replace('\x1b', '').split('m')[-1].strip() == tag.strip()
 
+def test_get_events_in_hour(visualizer, demo_events):
+    """Test getting events in a specific hour"""
+    # Test hour with multiple events
+    test_hour = datetime.now().replace(hour=10, minute=0)
+    events = visualizer.get_events_in_hour(demo_events, test_hour)
+    
+    # Should have 2 events: meeting ending at 10:30 and break starting at 10:30
+    assert len(events) == 2
+    assert events[0]['tag'] == 'meeting'
+    assert events[0]['duration'] == 30
+    assert events[1]['tag'] == 'break'
+    assert events[1]['duration'] == 30
+    
+    # Test hour with single event
+    test_hour = datetime.now().replace(hour=14, minute=0)
+    events = visualizer.get_events_in_hour(demo_events, test_hour)
+    assert len(events) == 1
+    assert events[0]['tag'] == 'work'
+    assert events[0]['duration'] == 60
+    
+    # Test hour with no events
+    test_hour = datetime.now().replace(hour=3, minute=0)
+    events = visualizer.get_events_in_hour(demo_events, test_hour)
+    assert len(events) == 0
+
