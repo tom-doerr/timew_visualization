@@ -279,6 +279,7 @@ if __name__ == "__main__":
     print("Fixed Width Examples:")
     print(visualizer.create_tag_label('verylongtagname', 'white', 'green', width=10))
     print(visualizer.create_tag_label('short', 'black', 'yellow', width=10))
+    print(visualizer.create_tag_label('mediumlength', 'black', 'yellow', width=15))
     print()
     
     
