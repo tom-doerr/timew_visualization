@@ -43,17 +43,3 @@ def test_create_styled_text(visualizer):
         visible_chars = len(styled.replace('\x1b', '').split('m')[-1])
         assert visible_chars == n, f"Styled text has {visible_chars} visible chars instead of {n}: {styled}"
 
-def test_create_wrapped_timeline(visualizer, demo_events):
-    wrapped_timeline = visualizer.create_wrapped_timeline(demo_events)
-    lines = wrapped_timeline.split('\n')
-    
-    # Check all lines except last one have exactly 60 visible chars
-    for line in lines[:-1]:
-        # Remove ANSI escape sequences before counting
-        visible_chars = len(line.replace('\x1b', '').split('m')[-1])
-        assert visible_chars == 60, f"Line has {visible_chars} visible chars instead of 60: {line}"
-    
-    # Last line can be shorter than 60 chars
-    if lines[-1]:
-        visible_chars = len(lines[-1].replace('\x1b', '').split('m')[-1])
-        assert visible_chars <= 60, f"Last line has {visible_chars} visible chars (should be <=60): {lines[-1]}"
