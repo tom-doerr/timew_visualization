@@ -29,6 +29,10 @@ class TimewarVisualizer:
                 label = label.ljust(width)
         return colored(label, fg_color, f"on_{bg_color}")
     
+    def create_blocks(self, n: int, bg_color: str = 'blue', fg_color: str = 'red', char: str = '█') -> str:
+        """Create a string of n colored blocks"""
+        return colored(char * n, fg_color, f"on_{bg_color}")
+
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
         if not events:
@@ -82,6 +86,13 @@ if __name__ == "__main__":
     print("Fixed Width Examples:")
     print(visualizer.create_tag_label('verylongtagname', 'white', 'green', width=10))
     print(visualizer.create_tag_label('short', 'black', 'yellow', width=10))
+    print()
+    
+    # Demo blocks
+    print("Block Examples:")
+    print(visualizer.create_blocks(10, 'green', 'white'))
+    print(visualizer.create_blocks(5, 'red', 'black'))
+    print(visualizer.create_blocks(15, 'blue', 'red', '▓'))
     print()
     
     # Demo data
