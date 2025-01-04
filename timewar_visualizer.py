@@ -186,12 +186,20 @@ class TimewarVisualizer:
                 
                 # Wrap if we've reached the limit
                 if visible_count >= wrap_at:
+                    # Pad with spaces if needed to reach exact width
+                    while visible_count < wrap_at:
+                        current_line.append(' ')
+                        visible_count += 1
                     wrapped.append(''.join(current_line))
                     current_line = []
                     visible_count = 0
         
         # Add any remaining characters
         if current_line:
+            # Pad last line with spaces to reach exact width
+            while visible_count < wrap_at:
+                current_line.append(' ')
+                visible_count += 1
             wrapped.append(''.join(current_line))
             
         return '\n'.join(wrapped)
