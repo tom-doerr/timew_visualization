@@ -94,19 +94,32 @@ def test_get_hourly_summary(visualizer, demo_events):
     """Test getting structured hourly summary"""
     summary = visualizer.get_hourly_summary(demo_events)
     
-    # Test 10:00 hour
+    # Test specific hours
     assert '10:00' in summary
     assert summary['10:00']['meeting'] == 30
     assert summary['10:00']['break'] == 30
     assert sum(summary['10:00'].values()) == 60
     
-    # Test 14:00 hour
     assert '14:00' in summary
     assert summary['14:00']['work'] == 24
     assert summary['14:00']['untracked'] == 36
     assert sum(summary['14:00'].values()) == 60
     
-    # Test hour with no events
     assert '03:00' in summary
     assert summary['03:00']['untracked'] == 60
+    
+    # Test that all hours sum to 60 minutes
+    for hour, tags in summary.items():
+        total = sum(tags.values())
+        assert total == 60, f"Hour {hour} sums to {total} minutes instead of 60"
+        
+    # Test that all hours between first and last event are present
+    start_hour = min(e['start'] for e in demo_events).replace(minute=0, second=0, microsecond=0)
+    end_hour = max(e['end'] for e in demo_events).replace(minute=0, second=0, microsecond=0)
+    
+    current_hour = start_hour
+    while current_hour <= end_hour:
+        hour_key = current_hour.strftime("%H:%M")
+        assert hour_key in summary, f"Missing hour {hour_key} in summary"
+        current_hour += timedelta(hours=1)
 
