@@ -133,11 +133,15 @@ class TimewarVisualizer:
                     color = self.get_color_for_tag(active_event['tag'])
                     # Show tag text only at start of event, blocks for rest
                     if time_point == active_event['start']:
-                        char = colored(f" {active_event['tag']} ", "red", "on_blue")
+                        char = self.create_tag_label(
+                            active_event['tag'], 
+                            fg_color='white',
+                            bg_color=color
+                        )
                     else:
-                        char = colored("█", "red", "on_blue")
+                        char = self.create_blocks(1, bg_color=color, fg_color='white')
                 else:
-                    char = colored("░", attrs=['dark'])
+                    char = self.create_blocks(1, bg_color='black', fg_color='white', char='░')
                 
                 timeline.append(char)
             
