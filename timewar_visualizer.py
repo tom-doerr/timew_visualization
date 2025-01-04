@@ -65,8 +65,11 @@ class TimewarVisualizer:
             self.console.print("No events to display", style="red")
             return
             
+        # Set static start time to 4 AM
+        start_time = datetime.now().replace(hour=4, minute=0, second=0, microsecond=0)
+        
         # Group events by hour
-        current_hour = events[0]['start'].replace(minute=0, second=0, microsecond=0)
+        current_hour = start_time
         end_time = events[-1]['end']
         
         while current_hour <= end_time:
