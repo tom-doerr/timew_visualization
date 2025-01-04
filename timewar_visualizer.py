@@ -44,13 +44,12 @@ class TimewarVisualizer:
                 
                 if active_event:
                     color = self.get_color_for_tag(active_event['tag'])
-                    char = colored("█", color)
+                    char = colored("█", color, f"on_{color}")
                     # Add text label at the start of the event
                     if time_point == active_event['start']:
                         # Generate random colors
                         colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'cyan']
-                        # bg_color = random.choice(colors)
-                        bg_color = 'blue'
+                        bg_color = random.choice(colors)
                         fg_color = random.choice([c for c in colors if c != bg_color])
                         char = colored(f"▓{active_event['label']}▓", fg_color, f"on_{bg_color}")
                 else:
