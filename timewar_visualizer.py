@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
-from rich.console import Console
-from rich.text import Text
-from rich.style import Style
-from typing import List, Dict, Optional
+from blessed import Terminal
+from typing import List, Dict
 import sys
 import random
 
 class TimewarVisualizer:
     def __init__(self):
-        self.console = Console()
-        self.tag_styles = {
-            'work': Style(color='blue', bold=True),
-            'meeting': Style(color='green', bold=True),
-            'coding': Style(color='yellow', bold=True),
-            'break': Style(color='red', bold=True),
+        self.term = Terminal()
+        self.tag_colors = {
+            'work': self.term.blue,
+            'meeting': self.term.green,
+            'coding': self.term.yellow,
+            'break': self.term.red,
         }
     
-    def get_style_for_tag(self, tag: str) -> Style:
-        """Get style for a tag, defaulting to white if not found"""
-        return self.tag_styles.get(tag.lower(), Style(color='white'))
+    def get_color_for_tag(self, tag: str):
+        """Get color function for a tag, defaulting to white if not found"""
+        return self.tag_colors.get(tag.lower(), self.term.white)
     
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
@@ -36,7 +34,7 @@ class TimewarVisualizer:
             hour_label = current_hour.strftime("%H:%M")
             
             # Create the timeline bar
-            timeline = Text()
+            timeline = []
             for minute in range(60):
                 time_point = current_hour + timedelta(minutes=minute)
                 # Find active event at this minute
@@ -46,25 +44,25 @@ class TimewarVisualizer:
                 )
                 
                 if active_event:
+                    color_fn = self.get_color_for_tag(active_event['tag'])
                     char = "█"
-                    style = self.get_style_for_tag(active_event['tag'])
                     # Add text label at the start of the event
                     if time_point == active_event['start']:
-                        # Use a different character for text segments with padding
-                        char = f"▓{active_event['label']}▓"
-                        # Random colors from a predefined palette
-                        colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'cyan']
+                        # Generate random colors
+                        colors = [self.term.red, self.term.green, self.term.blue,
+                                 self.term.yellow, self.term.magenta, self.term.cyan]
                         bg_color = random.choice(colors)
                         fg_color = random.choice([c for c in colors if c != bg_color])
-                        style = Style(color=fg_color, bgcolor=bg_color, bold=True)
+                        char = f"▓{fg_color}{bg_color}{active_event['label']}{self.term.normal}▓"
+                    else:
+                        char = color_fn("█")
                 else:
-                    char = "░"
-                    style = Style(dim=True)
+                    char = self.term.dim("░")
                 
-                timeline.append(char, style=style)
+                timeline.append(char)
             
             # Print the hour line
-            self.console.print(f"{hour_label} {timeline}")
+            print(f"{self.term.bold}{hour_label}{self.term.normal} {''.join(timeline)}")
             current_hour += timedelta(hours=1)
 
 if __name__ == "__main__":
