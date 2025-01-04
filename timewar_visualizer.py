@@ -17,6 +17,10 @@ class TimewarVisualizer:
     def get_color_for_tag(self, tag: str):
         """Get color name for a tag, defaulting to white if not found"""
         return self.tag_colors.get(tag.lower(), 'white')
+        
+    def create_tag_label(self, tag: str, fg_color: str = 'white', bg_color: str = 'blue') -> str:
+        """Create a colored tag label with background"""
+        return colored(f" {tag} ", fg_color, f"on_{bg_color}")
     
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
@@ -59,6 +63,15 @@ class TimewarVisualizer:
             current_hour += timedelta(hours=1)
 
 if __name__ == "__main__":
+    # Demo tag labels
+    visualizer = TimewarVisualizer()
+    print("Tag Label Examples:")
+    print(visualizer.create_tag_label('meeting', 'white', 'green'))
+    print(visualizer.create_tag_label('coding', 'black', 'yellow'))
+    print(visualizer.create_tag_label('break', 'white', 'red'))
+    print(visualizer.create_tag_label('work', 'white', 'blue'))
+    print()
+    
     # Demo data
     demo_events = [
         {
