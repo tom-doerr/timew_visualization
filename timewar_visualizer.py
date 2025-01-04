@@ -86,6 +86,15 @@ class TimewarVisualizer:
         if not events:
             print(colored("No events to display", "red"))
             return
+        
+        # Show hourly summary first
+        print("\nHourly Summary:")
+        summary = self.get_hourly_summary(events)
+        for hour, tags in summary.items():
+            print(f"{hour}:")
+            for tag, minutes in tags.items():
+                print(f"  {tag}: {minutes} minutes")
+        print()
             
         start_time = min(e['start'] for e in events).replace(minute=0, second=0, microsecond=0)
         end_time = max(e['end'] for e in events).replace(minute=0, second=0, microsecond=0)
