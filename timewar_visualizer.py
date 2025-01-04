@@ -141,6 +141,12 @@ if __name__ == "__main__":
             'tag': 'coding',
             'label': 'Feature X'
         },
+        {
+            'start': datetime.now().replace(hour=14, minute=36),
+            'end': datetime.now().replace(hour=17, minute=12),
+            'tag': 'work',
+            'label': 'Project Y'
+        },
     ]
     
     # Demo hourly blocks
