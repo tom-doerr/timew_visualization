@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
-from blessed import Terminal
+from termcolor import colored
 from typing import List, Dict
 import sys
 import random
 
 class TimewarVisualizer:
     def __init__(self):
-        self.term = Terminal()
         self.tag_colors = {
-            'work': self.term.blue,
-            'meeting': self.term.green,
-            'coding': self.term.yellow,
-            'break': self.term.red,
+            'work': 'blue',
+            'meeting': 'green',
+            'coding': 'yellow',
+            'break': 'red',
         }
     
     def get_color_for_tag(self, tag: str):
-        """Get color function for a tag, defaulting to white if not found"""
-        return self.tag_colors.get(tag.lower(), self.term.white)
+        """Get color name for a tag, defaulting to white if not found"""
+        return self.tag_colors.get(tag.lower(), 'white')
     
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
@@ -44,25 +43,22 @@ class TimewarVisualizer:
                 )
                 
                 if active_event:
-                    color_fn = self.get_color_for_tag(active_event['tag'])
-                    char = "█"
+                    color = self.get_color_for_tag(active_event['tag'])
+                    char = colored("█", color)
                     # Add text label at the start of the event
                     if time_point == active_event['start']:
                         # Generate random colors
-                        colors = [self.term.red, self.term.green, self.term.blue,
-                                 self.term.yellow, self.term.magenta, self.term.cyan]
+                        colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'cyan']
                         bg_color = random.choice(colors)
                         fg_color = random.choice([c for c in colors if c != bg_color])
-                        char = f"▓{fg_color}{bg_color}{active_event['label']}{self.term.normal}▓"
-                    else:
-                        char = color_fn("█")
+                        char = colored(f"▓{active_event['label']}▓", fg_color, f"on_{bg_color}")
                 else:
-                    char = self.term.dim("░")
+                    char = colored("░", attrs=['dark'])
                 
                 timeline.append(char)
             
             # Print the hour line
-            print(f"{self.term.bold}{hour_label}{self.term.normal} {''.join(timeline)}")
+            print(f"{colored(hour_label, attrs=['bold'])} {''.join(timeline)}")
             current_hour += timedelta(hours=1)
 
 if __name__ == "__main__":
