@@ -116,6 +116,34 @@ class TimewarVisualizer:
         if len(timeline) % 60 != 0:
             print(f"{''.join(timeline[-(len(timeline)%60):])}")
 
+    def create_single_line_timeline(self, events: List[Dict], width: int = 60) -> str:
+        """Create a single line timeline visualization"""
+        if not events:
+            return colored("No events", "red")
+            
+        # Find earliest start and latest end times
+        start_time = min(e['start'] for e in events)
+        end_time = max(e['end'] for e in events)
+        total_minutes = int((end_time - start_time).total_seconds() / 60)
+        
+        # Calculate scale factor
+        scale = width / total_minutes if total_minutes > 0 else 1
+        
+        timeline = []
+        for event in events:
+            # Calculate event duration in minutes
+            duration = int((event['end'] - event['start']).total_seconds() / 60)
+            scaled_duration = max(1, int(duration * scale))
+            
+            # Get color for tag
+            color = self.get_color_for_tag(event['tag'])
+            
+            # Create block for event
+            block = self.create_blocks(scaled_duration, bg_color=color, fg_color='white')
+            timeline.append(block)
+        
+        return ''.join(timeline)
+
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
         if not events:
@@ -124,6 +152,9 @@ class TimewarVisualizer:
             
         print("\nContinuous Timeline:")
         self.create_continuous_timeline(events)
+        
+        print("\nSingle Line Timeline:")
+        print(self.create_single_line_timeline(events))
         
         print("\nHourly Breakdown:")
         # Set static start time to 4 AM
@@ -233,3 +264,9 @@ if __name__ == "__main__":
     
     # Create timeline
     visualizer.create_timeline(demo_events)
+    
+    # Demo single line timeline
+    print("\nSingle Line Timeline Demo:")
+    print(visualizer.create_single_line_timeline(demo_events, width=80))
+    print(visualizer.create_single_line_timeline(demo_events, width=40))
+    print(visualizer.create_single_line_timeline(demo_events, width=20))
