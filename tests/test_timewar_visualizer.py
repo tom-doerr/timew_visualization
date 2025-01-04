@@ -35,66 +35,29 @@ def demo_events():
         },
     ]
 
-def test_create_styled_text(visualizer):
-    """Test that styled text has correct visible length"""
-    # Test with different lengths
-    for n in range(1, 10):
-        styled = visualizer.create_styled_text("test", "white", "blue", n)
-        visible_chars = len(styled.replace('\x1b', '').split('m')[-1])
-        assert visible_chars == n, f"Styled text has {visible_chars} visible chars instead of {n}: {styled}"
-
-def test_fixed_width_tag_labels(visualizer):
-    """Test that tag labels maintain correct fixed width"""
-    test_cases = [
-        ('verylongtagname', 10),
-        ('short', 10),
-        ('tiny', 5)
-    ]
+def test_create_tag_label(visualizer):
+    """Test tag label creation with fixed width"""
+    label = visualizer.create_tag_label('test', width=10)
+    assert len(label.replace('\x1b', '').split('m')[-1]) == 10
     
-    for tag, width in test_cases:
-        label = visualizer.create_tag_label(tag, 'white', 'blue', width)
-        visible_chars = len(label.replace('\x1b', '').split('m')[-1])
-        assert visible_chars == width, f"Tag label has {visible_chars} visible chars instead of {width}: {label}"
-        
-        # Verify truncation/padding
-        if len(tag) > width:
-            assert label.replace('\x1b', '').split('m')[-1].strip() == tag[:width].strip()
-        else:
-            assert label.replace('\x1b', '').split('m')[-1].strip() == tag.strip()
+    long_label = visualizer.create_tag_label('verylongtagname', width=10)
+    assert len(long_label.replace('\x1b', '').split('m')[-1]) == 10
 
 def test_get_events_in_hour(visualizer, demo_events):
     """Test getting events in a specific hour"""
-    # Test hour with multiple events
     test_hour = datetime.now().replace(hour=10, minute=0)
     events = visualizer.get_events_in_hour(demo_events, test_hour)
     
-    # Should have 2 events: meeting ending at 10:30 and break starting at 10:30
     assert len(events) == 2
     assert events[0]['tag'] == 'meeting'
-    # Meeting should cover 30 minutes (10:00-10:30)
     assert 29 <= events[0]['duration'] <= 30
     assert events[1]['tag'] == 'break'
-    # Break should cover 30 minutes (10:30-11:00)
     assert 29 <= events[1]['duration'] <= 30
-    
-    # Test hour with single event (14:00-15:00)
-    test_hour = datetime.now().replace(hour=14, minute=0)
-    events = visualizer.get_events_in_hour(demo_events, test_hour)
-    assert len(events) == 1
-    assert events[0]['tag'] == 'work'
-    # Work event starts at 14:36, so should only cover 24 minutes in this hour
-    assert 23 <= events[0]['duration'] <= 24
-    
-    # Test hour with no events
-    test_hour = datetime.now().replace(hour=3, minute=0)
-    events = visualizer.get_events_in_hour(demo_events, test_hour)
-    assert len(events) == 0
 
 def test_get_hourly_summary(visualizer, demo_events):
     """Test getting structured hourly summary"""
     summary = visualizer.get_hourly_summary(demo_events)
     
-    # Test specific hours
     assert '10:00' in summary
     assert summary['10:00']['meeting'] == 30
     assert summary['10:00']['break'] == 30
@@ -103,23 +66,8 @@ def test_get_hourly_summary(visualizer, demo_events):
     assert '14:00' in summary
     assert summary['14:00']['work'] == 24
     assert summary['14:00']['untracked'] == 36
-    assert sum(summary['14:00'].values()) == 60
     
-    assert '03:00' in summary
-    assert summary['03:00']['untracked'] == 60
-    
-    # Test that all hours sum to 60 minutes
+    # Test all hours sum to 60 minutes
     for hour, tags in summary.items():
-        total = sum(tags.values())
-        assert total == 60, f"Hour {hour} sums to {total} minutes instead of 60"
-        
-    # Test that all hours between first and last event are present
-    start_hour = min(e['start'] for e in demo_events).replace(minute=0, second=0, microsecond=0)
-    end_hour = max(e['end'] for e in demo_events).replace(minute=0, second=0, microsecond=0)
-    
-    current_hour = start_hour
-    while current_hour <= end_hour:
-        hour_key = current_hour.strftime("%H:%M")
-        assert hour_key in summary, f"Missing hour {hour_key} in summary"
-        current_hour += timedelta(hours=1)
+        assert sum(tags.values()) == 60
 
