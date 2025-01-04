@@ -336,3 +336,21 @@ if __name__ == "__main__":
             'label': 'Project Y'
         },
     ]
+
+    # Demo get_events_in_hour functionality
+    print("\nHourly Events Demo:")
+    test_hours = [
+        datetime.now().replace(hour=10, minute=0),  # 10:00
+        datetime.now().replace(hour=14, minute=0),  # 14:00
+        datetime.now().replace(hour=3, minute=0)    # 03:00
+    ]
+    
+    for hour in test_hours:
+        print(f"\nEvents at {hour.strftime('%H:%M')}:")
+        events = visualizer.get_events_in_hour(demo_events, hour)
+        if not events:
+            print("No events")
+            continue
+            
+        for event in events:
+            print(f"- {event['tag']}: {event['start'].strftime('%H:%M')} to {event['end'].strftime('%H:%M')} ({event['duration']} mins)")
