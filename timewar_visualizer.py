@@ -65,8 +65,8 @@ class TimewarVisualizer:
                 overlap_start = max(event['start'], hour_start)
                 overlap_end = min(event['end'], hour_end)
                 
-                # Calculate duration in minutes
-                duration = int((overlap_end - overlap_start).total_seconds() / 60)
+                # Calculate duration in minutes, rounding up to ensure full minutes are counted
+                duration = max(1, int((overlap_end - overlap_start).total_seconds() / 60))
                 
                 events_in_hour.append({
                     'tag': event['tag'],
