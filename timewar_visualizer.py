@@ -104,6 +104,46 @@ class TimewarVisualizer:
         
         return hourly_data
 
+    def get_hourly_summary(self, events: List[Dict]) -> Dict[str, Dict[str, int]]:
+        """Get structured summary of time spent per tag in each hour.
+        Includes untracked time and ensures each hour sums to 60 minutes."""
+        hourly_summary = {}
+        
+        # Get earliest start and latest end times
+        start_time = min(e['start'] for e in events) if events else datetime.now().replace(hour=0, minute=0)
+        end_time = max(e['end'] for e in events) if events else datetime.now().replace(hour=23, minute=59)
+        
+        # Initialize hourly summary
+        current_hour = start_time.replace(minute=0, second=0, microsecond=0)
+        while current_hour <= end_time:
+            hour_key = current_hour.strftime("%H:%M")
+            hourly_summary[hour_key] = {}
+            current_hour += timedelta(hours=1)
+        
+        # Process events
+        for event in events:
+            current_time = event['start']
+            while current_time < event['end']:
+                hour_key = current_time.strftime("%H:%M")
+                end_of_hour = current_time.replace(minute=59, second=59, microsecond=999999)
+                duration = min(event['end'], end_of_hour) - current_time
+                duration_min = int(duration.total_seconds() / 60)
+                
+                if event['tag'] not in hourly_summary[hour_key]:
+                    hourly_summary[hour_key][event['tag']] = 0
+                hourly_summary[hour_key][event['tag']] += duration_min
+                
+                current_time = end_of_hour + timedelta(microseconds=1)
+        
+        # Add untracked time
+        for hour_key, tags in hourly_summary.items():
+            total_tracked = sum(tags.values())
+            untracked = 60 - total_tracked
+            if untracked > 0:
+                hourly_summary[hour_key]['untracked'] = untracked
+        
+        return hourly_summary
+
     def create_continuous_timeline(self, events: List[Dict]) -> None:
         """Create a continuous timeline with wrapping every 60 chars"""
         if not events:
@@ -354,3 +394,12 @@ if __name__ == "__main__":
             
         for event in events:
             print(f"- {event['tag']}: {event['start'].strftime('%H:%M')} to {event['end'].strftime('%H:%M')} ({event['duration']} mins)")
+
+    # Demo get_hourly_summary functionality
+    print("\nHourly Summary Demo:")
+    summary = visualizer.get_hourly_summary(demo_events)
+    for hour, tags in summary.items():
+        print(f"\n{hour}:")
+        for tag, minutes in tags.items():
+            print(f"- {tag}: {minutes} mins")
+        assert sum(tags.values()) == 60, f"Hour {hour} should sum to 60 minutes"

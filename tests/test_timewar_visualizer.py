@@ -90,3 +90,23 @@ def test_get_events_in_hour(visualizer, demo_events):
     events = visualizer.get_events_in_hour(demo_events, test_hour)
     assert len(events) == 0
 
+def test_get_hourly_summary(visualizer, demo_events):
+    """Test getting structured hourly summary"""
+    summary = visualizer.get_hourly_summary(demo_events)
+    
+    # Test 10:00 hour
+    assert '10:00' in summary
+    assert summary['10:00']['meeting'] == 30
+    assert summary['10:00']['break'] == 30
+    assert sum(summary['10:00'].values()) == 60
+    
+    # Test 14:00 hour
+    assert '14:00' in summary
+    assert summary['14:00']['work'] == 24
+    assert summary['14:00']['untracked'] == 36
+    assert sum(summary['14:00'].values()) == 60
+    
+    # Test hour with no events
+    assert '03:00' in summary
+    assert summary['03:00']['untracked'] == 60
+
