@@ -49,7 +49,8 @@ class TimewarVisualizer:
                     if time_point == active_event['start']:
                         # Generate random colors
                         colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'cyan']
-                        bg_color = random.choice(colors)
+                        # bg_color = random.choice(colors)
+                        bg_color = 'blue'
                         fg_color = random.choice([c for c in colors if c != bg_color])
                         char = colored(f"▓{active_event['label']}▓", fg_color, f"on_{bg_color}")
                 else:
