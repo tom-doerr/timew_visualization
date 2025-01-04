@@ -5,6 +5,7 @@ from rich.text import Text
 from rich.style import Style
 from typing import List, Dict, Optional
 import sys
+import random
 
 class TimewarVisualizer:
     def __init__(self):
@@ -51,7 +52,11 @@ class TimewarVisualizer:
                     if time_point == active_event['start']:
                         # Use a different character for text segments with padding
                         char = f"▓{active_event['label']}▓"
-                        style = style + Style(bgcolor="black")
+                        # Random colors from a predefined palette
+                        colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'cyan']
+                        bg_color = random.choice(colors)
+                        fg_color = random.choice([c for c in colors if c != bg_color])
+                        style = Style(color=fg_color, bgcolor=bg_color, bold=True)
                 else:
                     char = "░"
                     style = Style(dim=True)
