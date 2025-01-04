@@ -33,6 +33,32 @@ class TimewarVisualizer:
         """Create a string of n colored blocks"""
         return colored(char * n, fg_color, f"on_{bg_color}")
 
+    def get_hourly_blocks(self, events: List[Dict]) -> Dict[str, List[Dict]]:
+        """Get tag blocks per hour with their duration in minutes"""
+        hourly_data = {}
+        
+        for event in events:
+            current_time = event['start']
+            while current_time < event['end']:
+                hour_key = current_time.strftime("%H:%M")
+                if hour_key not in hourly_data:
+                    hourly_data[hour_key] = []
+                
+                # Calculate duration in this hour
+                end_of_hour = current_time.replace(minute=59, second=59, microsecond=999999)
+                duration = min(event['end'], end_of_hour) - current_time
+                duration_min = int(duration.total_seconds() / 60)
+                
+                hourly_data[hour_key].append({
+                    'tag': event['tag'],
+                    'duration': duration_min
+                })
+                
+                # Move to next hour
+                current_time = end_of_hour + timedelta(microseconds=1)
+        
+        return hourly_data
+
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
         if not events:
@@ -117,5 +143,14 @@ if __name__ == "__main__":
         },
     ]
     
+    # Demo hourly blocks
+    print("\nHourly Block Breakdown:")
     visualizer = TimewarVisualizer()
+    hourly_blocks = visualizer.get_hourly_blocks(demo_events)
+    for hour, blocks in hourly_blocks.items():
+        print(f"{hour}:")
+        for block in blocks:
+            print(f"  {block['tag']}: {block['duration']} minutes")
+    
+    # Create timeline
     visualizer.create_timeline(demo_events)
