@@ -149,17 +149,50 @@ class TimewarVisualizer:
         return ''.join(timeline)
 
     def create_wrapped_timeline(self, events: List[Dict], wrap_at: int = 60) -> str:
-        """Create a timeline visualization that wraps every wrap_at characters"""
+        """Create a timeline visualization that wraps every wrap_at visible characters"""
         if not events:
             return colored("No events", "red")
             
         # Get the single line timeline
         timeline = self.create_single_line_timeline(events)
         
-        # Split into chunks of wrap_at characters
+        # Split into chunks of wrap_at visible characters
         wrapped = []
-        for i in range(0, len(timeline), wrap_at):
-            wrapped.append(timeline[i:i+wrap_at])
+        current_line = []
+        visible_count = 0
+        
+        # Helper to detect ANSI escape sequences
+        def is_ansi_escape(char):
+            return char == '\x1b'
+        
+        # Helper to skip ANSI sequence
+        def skip_ansi_sequence(timeline, i):
+            while i < len(timeline) and timeline[i] != 'm':
+                i += 1
+            return i + 1  # Skip the 'm' too
+        
+        i = 0
+        while i < len(timeline):
+            if is_ansi_escape(timeline[i]):
+                # Add the entire ANSI sequence to current line
+                start = i
+                i = skip_ansi_sequence(timeline, i)
+                current_line.append(timeline[start:i])
+            else:
+                # Add visible character and count it
+                current_line.append(timeline[i])
+                visible_count += 1
+                i += 1
+                
+                # Wrap if we've reached the limit
+                if visible_count >= wrap_at:
+                    wrapped.append(''.join(current_line))
+                    current_line = []
+                    visible_count = 0
+        
+        # Add any remaining characters
+        if current_line:
+            wrapped.append(''.join(current_line))
             
         return '\n'.join(wrapped)
 
