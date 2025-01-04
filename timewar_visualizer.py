@@ -46,6 +46,9 @@ class TimewarVisualizer:
         if n > 1:
             empty = colored(" " * len(text), fg_color, f"on_{bg_color}")
             styled += empty * (n - 1)
+
+        # shorten the string to n characters
+        styled = styled[:n]
             
         return styled
 
