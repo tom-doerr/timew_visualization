@@ -33,6 +33,11 @@ class TimewarVisualizer:
         """Create a string of n colored blocks"""
         return colored(char * n, fg_color, f"on_{bg_color}")
 
+    def create_styled_text(self, text: str, fg_color: str, bg_color: str, n: int = 1) -> str:
+        """Create styled text with foreground and background colors, repeated n times"""
+        styled = colored(text, fg_color, f"on_{bg_color}")
+        return styled * n
+
     def get_hourly_blocks(self, events: List[Dict]) -> Dict[str, List[Dict]]:
         """Get tag blocks per hour with their duration in minutes"""
         hourly_data = {}
