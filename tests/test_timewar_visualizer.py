@@ -43,3 +43,23 @@ def test_create_styled_text(visualizer):
         visible_chars = len(styled.replace('\x1b', '').split('m')[-1])
         assert visible_chars == n, f"Styled text has {visible_chars} visible chars instead of {n}: {styled}"
 
+def test_fixed_width_tag_labels(visualizer):
+    """Test that tag labels maintain correct fixed width"""
+    test_cases = [
+        ('verylongtagname', 10),
+        ('short', 10),
+        ('mediumlength', 15),
+        ('tiny', 5)
+    ]
+    
+    for tag, width in test_cases:
+        label = visualizer.create_tag_label(tag, 'white', 'blue', width)
+        visible_chars = len(label.replace('\x1b', '').split('m')[-1])
+        assert visible_chars == width, f"Tag label has {visible_chars} visible chars instead of {width}: {label}"
+        
+        # Verify truncation/padding
+        if len(tag) > width:
+            assert label.replace('\x1b', '').split('m')[-1].strip() == tag[:width].strip()
+        else:
+            assert label.replace('\x1b', '').split('m')[-1].strip() == tag.strip()
+
