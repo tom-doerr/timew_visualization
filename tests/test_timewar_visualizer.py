@@ -35,6 +35,14 @@ def demo_events():
         },
     ]
 
+def test_create_styled_text(visualizer):
+    """Test that styled text has correct visible length"""
+    # Test with different lengths
+    for n in range(1, 10):
+        styled = visualizer.create_styled_text("test", "white", "blue", n)
+        visible_chars = len(styled.replace('\x1b', '').split('m')[-1])
+        assert visible_chars == n, f"Styled text has {visible_chars} visible chars instead of {n}: {styled}"
+
 def test_create_wrapped_timeline(visualizer, demo_events):
     wrapped_timeline = visualizer.create_wrapped_timeline(demo_events)
     lines = wrapped_timeline.split('\n')
