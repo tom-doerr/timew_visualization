@@ -148,6 +148,21 @@ class TimewarVisualizer:
         
         return ''.join(timeline)
 
+    def create_wrapped_timeline(self, events: List[Dict], wrap_at: int = 60) -> str:
+        """Create a timeline visualization that wraps every wrap_at characters"""
+        if not events:
+            return colored("No events", "red")
+            
+        # Get the single line timeline
+        timeline = self.create_single_line_timeline(events)
+        
+        # Split into chunks of wrap_at characters
+        wrapped = []
+        for i in range(0, len(timeline), wrap_at):
+            wrapped.append(timeline[i:i+wrap_at])
+            
+        return '\n'.join(wrapped)
+
     def create_timeline(self, events: List[Dict]) -> None:
         """Create and display a timeline visualization"""
         if not events:
@@ -272,3 +287,7 @@ if __name__ == "__main__":
     # Demo single line timeline
     print("\nSingle Line Timeline:")
     print(visualizer.create_single_line_timeline(demo_events))
+    
+    # Demo wrapped timeline
+    print("\nWrapped Timeline:")
+    print(visualizer.create_wrapped_timeline(demo_events))
