@@ -49,7 +49,9 @@ class TimewarVisualizer:
                     style = self.get_style_for_tag(active_event['tag'])
                     # Add text label at the start of the event
                     if time_point == active_event['start']:
-                        char = f" {active_event['label']} "
+                        # Use a different character for text segments with padding
+                        char = f"▓{active_event['label']}▓"
+                        style = style + Style(bgcolor="black")
                 else:
                     char = "░"
                     style = Style(dim=True)
