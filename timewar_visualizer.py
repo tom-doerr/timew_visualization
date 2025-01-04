@@ -107,42 +107,35 @@ class TimewarVisualizer:
     def get_hourly_summary(self, events: List[Dict]) -> Dict[str, Dict[str, int]]:
         """Get structured summary of time spent per tag in each hour.
         Includes untracked time and ensures each hour sums to 60 minutes."""
-        hourly_summary = {}
-        
         if not events:
             return {}
-            
-        # Get earliest start and latest end times
+
+        # Initialize hourly summary for all hours between first and last event
         start_time = min(e['start'] for e in events).replace(minute=0, second=0, microsecond=0)
         end_time = max(e['end'] for e in events).replace(minute=0, second=0, microsecond=0)
         
-        # Initialize hourly summary for all hours between start and end
-        current_hour = start_time
-        while current_hour <= end_time:
-            hour_key = current_hour.strftime("%H:%M")
-            hourly_summary[hour_key] = {}
-            current_hour += timedelta(hours=1)
-            
-        # Also include the hour after end_time if events extend into it
-        if max(e['end'] for e in events) > end_time:
-            hour_key = (end_time + timedelta(hours=1)).strftime("%H:%M")
-            hourly_summary[hour_key] = {}
-        
-        # Process events
+        # Create empty hourly buckets
+        hourly_summary = {
+            (start_time + timedelta(hours=i)).strftime("%H:%M"): {}
+            for i in range(int((end_time - start_time).total_seconds() // 3600) + 1)
+        }
+
+        # Process each event
         for event in events:
-            current_time = event['start']
+            current_time = event['start'].replace(minute=0, second=0, microsecond=0)
             while current_time < event['end']:
                 hour_key = current_time.strftime("%H:%M")
-                end_of_hour = current_time.replace(minute=59, second=59, microsecond=999999)
-                duration = min(event['end'], end_of_hour) - current_time
-                duration_min = int(duration.total_seconds() / 60)
+                end_of_hour = current_time + timedelta(hours=1)
+                duration = min(event['end'], end_of_hour) - max(event['start'], current_time)
+                duration_min = max(0, int(duration.total_seconds() / 60))
                 
-                if event['tag'] not in hourly_summary[hour_key]:
-                    hourly_summary[hour_key][event['tag']] = 0
-                hourly_summary[hour_key][event['tag']] += duration_min
+                if duration_min > 0:
+                    if event['tag'] not in hourly_summary[hour_key]:
+                        hourly_summary[hour_key][event['tag']] = 0
+                    hourly_summary[hour_key][event['tag']] += duration_min
                 
-                current_time = end_of_hour + timedelta(microseconds=1)
-        
+                current_time = end_of_hour
+
         # Add untracked time
         for hour_key, tags in hourly_summary.items():
             total_tracked = sum(tags.values())
