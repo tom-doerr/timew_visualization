@@ -59,16 +59,59 @@ class TimewarVisualizer:
         
         return hourly_data
 
-    def create_timeline(self, events: List[Dict]) -> None:
-        """Create and display a timeline visualization"""
+    def create_continuous_timeline(self, events: List[Dict]) -> None:
+        """Create a continuous timeline with wrapping every 60 chars"""
         if not events:
             self.console.print("No events to display", style="red")
             return
             
         # Set static start time to 4 AM
         start_time = datetime.now().replace(hour=4, minute=0, second=0, microsecond=0)
+        current_time = start_time
+        end_time = datetime.now()
         
-        # Group events by hour
+        timeline = []
+        while current_time <= end_time:
+            # Find active event at this minute
+            active_event = next(
+                (e for e in events if e['start'] <= current_time < e['end']),
+                None
+            )
+            
+            if active_event:
+                color = self.get_color_for_tag(active_event['tag'])
+                # Show tag text only at start of event, blocks for rest
+                if current_time == active_event['start']:
+                    char = colored(f" {active_event['tag']} ", "red", "on_blue")
+                else:
+                    char = colored("█", "red", "on_blue")
+            else:
+                char = colored("░", attrs=['dark'])
+            
+            timeline.append(char)
+            
+            # Print line every 60 chars
+            if len(timeline) % 60 == 0:
+                print(f"{''.join(timeline[-60:])}")
+            
+            current_time += timedelta(minutes=1)
+        
+        # Print any remaining chars
+        if len(timeline) % 60 != 0:
+            print(f"{''.join(timeline[-(len(timeline)%60):])}")
+
+    def create_timeline(self, events: List[Dict]) -> None:
+        """Create and display a timeline visualization"""
+        if not events:
+            self.console.print("No events to display", style="red")
+            return
+            
+        print("\nContinuous Timeline:")
+        self.create_continuous_timeline(events)
+        
+        print("\nHourly Breakdown:")
+        # Set static start time to 4 AM
+        start_time = datetime.now().replace(hour=4, minute=0, second=0, microsecond=0)
         current_hour = start_time
         end_time = events[-1]['end']
         
