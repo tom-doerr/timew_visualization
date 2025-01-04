@@ -20,13 +20,15 @@ class TimewarVisualizer:
         
     def create_tag_label(self, tag: str, fg_color: str = 'white', bg_color: str = 'blue', width: int = None) -> str:
         """Create a colored tag label with background, optionally fixed width"""
-        label = f"{tag} "
+        label = tag
         if width is not None:
             # Truncate or pad to fit width
             if len(label) > width:
                 label = label[:width]
             else:
                 label = label.ljust(width)
+        # Add space after label for better readability
+        label = f"{label} "
         return colored(label, fg_color, f"on_{bg_color}")
     
     def create_blocks(self, n: int, bg_color: str = 'blue', fg_color: str = 'red', char: str = '█') -> str:
