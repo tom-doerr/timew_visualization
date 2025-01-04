@@ -126,8 +126,9 @@ class TimewarVisualizer:
             while current_time < event['end']:
                 hour_key = current_time.strftime("%H:%M")
                 end_of_hour = current_time + timedelta(hours=1)
+                # Calculate exact duration in minutes, rounding up to nearest minute
                 duration = min(event['end'], end_of_hour) - max(event['start'], current_time)
-                duration_min = max(0, int(duration.total_seconds() / 60))
+                duration_min = max(0, int((duration.total_seconds() + 59) // 60))  # Round up
                 
                 if duration_min > 0:
                     if event['tag'] not in hourly_summary[hour_key]:
