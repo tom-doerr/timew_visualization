@@ -77,12 +77,13 @@ def test_get_events_in_hour(visualizer, demo_events):
     # Break should cover 30 minutes (10:30-11:00)
     assert 29 <= events[1]['duration'] <= 30
     
-    # Test hour with single event
+    # Test hour with single event (14:00-15:00)
     test_hour = datetime.now().replace(hour=14, minute=0)
     events = visualizer.get_events_in_hour(demo_events, test_hour)
     assert len(events) == 1
     assert events[0]['tag'] == 'work'
-    assert events[0]['duration'] == 60
+    # Work event starts at 14:36, so should only cover 24 minutes in this hour
+    assert 23 <= events[0]['duration'] <= 24
     
     # Test hour with no events
     test_hour = datetime.now().replace(hour=3, minute=0)
