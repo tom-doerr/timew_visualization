@@ -34,9 +34,20 @@ class TimewarVisualizer:
         return colored(char * n, fg_color, f"on_{bg_color}")
 
     def create_styled_text(self, text: str, fg_color: str, bg_color: str, n: int = 1) -> str:
-        """Create styled text with foreground and background colors, repeated n times"""
-        styled = colored(text, fg_color, f"on_{bg_color}")
-        return styled * n
+        """Create styled text with foreground and background colors.
+        Shows text once followed by (n-1) empty colored blocks"""
+        if n < 1:
+            return ""
+            
+        # Create the text block
+        styled = colored(f" {text} ", fg_color, f"on_{bg_color}")
+        
+        # Create empty blocks if needed
+        if n > 1:
+            empty = colored(" " * len(text), fg_color, f"on_{bg_color}")
+            styled += empty * (n - 1)
+            
+        return styled
 
     def get_hourly_blocks(self, events: List[Dict]) -> Dict[str, List[Dict]]:
         """Get tag blocks per hour with their duration in minutes"""
@@ -178,9 +189,9 @@ if __name__ == "__main__":
 
     # Demo styled text
     print("Styled Text Examples:")
-    print(visualizer.create_styled_text("Hello", "red", "green", 3))
-    print(visualizer.create_styled_text("World", "blue", "yellow", 2))
-    print(visualizer.create_styled_text("Python", "white", "magenta"))
+    print(visualizer.create_styled_text("Hello", "red", "green", 5))
+    print(visualizer.create_styled_text("World", "blue", "yellow", 3))
+    print(visualizer.create_styled_text("Python", "white", "magenta", 4))
     print()
     
     # Demo data
