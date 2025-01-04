@@ -117,7 +117,7 @@ class TimewarVisualizer:
             print(f"{''.join(timeline[-(len(timeline)%60):])}")
 
     def create_single_line_timeline(self, events: List[Dict], width: int = 60) -> str:
-        """Create a single line timeline visualization"""
+        """Create a single line timeline visualization using styled text"""
         if not events:
             return colored("No events", "red")
             
@@ -138,9 +138,14 @@ class TimewarVisualizer:
             # Get color for tag
             color = self.get_color_for_tag(event['tag'])
             
-            # Create block for event
-            block = self.create_blocks(scaled_duration, bg_color=color, fg_color='white')
-            timeline.append(block)
+            # Create styled text for event
+            styled = self.create_styled_text(
+                event['tag'],
+                fg_color='white',
+                bg_color=color,
+                n=scaled_duration
+            )
+            timeline.append(styled)
         
         return ''.join(timeline)
 
