@@ -113,15 +113,20 @@ class TimewarVisualizer:
             return {}
             
         # Get earliest start and latest end times
-        start_time = min(e['start'] for e in events)
-        end_time = max(e['end'] for e in events)
+        start_time = min(e['start'] for e in events).replace(minute=0, second=0, microsecond=0)
+        end_time = max(e['end'] for e in events).replace(minute=0, second=0, microsecond=0)
         
         # Initialize hourly summary for all hours between start and end
-        current_hour = start_time.replace(minute=0, second=0, microsecond=0)
+        current_hour = start_time
         while current_hour <= end_time:
             hour_key = current_hour.strftime("%H:%M")
             hourly_summary[hour_key] = {}
             current_hour += timedelta(hours=1)
+            
+        # Also include the hour after end_time if events extend into it
+        if max(e['end'] for e in events) > end_time:
+            hour_key = (end_time + timedelta(hours=1)).strftime("%H:%M")
+            hourly_summary[hour_key] = {}
         
         # Process events
         for event in events:
