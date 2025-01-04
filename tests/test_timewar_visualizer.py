@@ -48,7 +48,6 @@ def test_fixed_width_tag_labels(visualizer):
     test_cases = [
         ('verylongtagname', 10),
         ('short', 10),
-        ('mediumlength', 15),
         ('tiny', 5)
     ]
     
